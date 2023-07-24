@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.7.4
+-- version 4.8.4
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 22-04-2018 a las 04:35:50
--- Versión del servidor: 10.1.26-MariaDB
--- Versión de PHP: 7.1.9
+-- Tiempo de generación: 25-07-2023 a las 00:19:58
+-- Versión del servidor: 10.1.37-MariaDB
+-- Versión de PHP: 7.3.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -44,8 +44,8 @@ CREATE TABLE `articulo` (
 --
 
 INSERT INTO `articulo` (`idarticulo`, `idcategoria`, `codigo`, `nombre`, `stock`, `descripcion`, `imagen`, `condicion`) VALUES
-(2, 10, '382974987234', 'Impresora Multi', 10, 'Multifuncional', '1522726906.jpg', 1),
-(3, 10, '32432423423', 'Impresora', 45, 'IMpresora', '1522726914.jpg', 1);
+(2, 10, '382974987234', 'Impresora Multi', 9, 'Multifuncional', '1522726906.jpg', 1),
+(3, 10, '32432423423', 'Impresora', 44, 'IMpresora', '1522726914.jpg', 1);
 
 -- --------------------------------------------------------
 
@@ -130,7 +130,9 @@ CREATE TABLE `detalle_venta` (
 INSERT INTO `detalle_venta` (`iddetalle_venta`, `idventa`, `idarticulo`, `cantidad`, `precio_venta`, `descuento`) VALUES
 (1, 1, 2, 3, '120.00', '0.00'),
 (2, 1, 3, 3, '10.00', '0.00'),
-(3, 2, 2, 2, '120.00', '0.00');
+(3, 2, 2, 2, '120.00', '0.00'),
+(4, 3, 2, 1, '120.00', '0.00'),
+(5, 4, 3, 1, '10.00', '0.00');
 
 --
 -- Disparadores `detalle_venta`
@@ -248,8 +250,6 @@ CREATE TABLE `usuario` (
 --
 -- Volcado de datos para la tabla `usuario`
 --
--- usuario: admin
--- pass: admin
 
 INSERT INTO `usuario` (`idusuario`, `nombre`, `tipo_documento`, `num_documento`, `direccion`, `telefono`, `email`, `cargo`, `login`, `clave`, `imagen`, `condicion`) VALUES
 (1, 'Admin', 'DNI', '63238', 'Conocido', '27386126', 'admin@gmail.com', '', 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', '1523752615.jpg', 1);
@@ -304,7 +304,9 @@ CREATE TABLE `venta` (
 
 INSERT INTO `venta` (`idventa`, `idcliente`, `idusuario`, `tipo_comprobante`, `serie_comprobante`, `num_comprobante`, `fecha_hora`, `impuesto`, `total_venta`, `estado`) VALUES
 (1, 5, 1, 'Factura', '0001', '0001', '2018-04-17 00:00:00', '18.00', '390.00', 'Aceptado'),
-(2, 4, 1, 'Boleta', '123', '1234', '2018-04-17 00:00:00', '0.00', '240.00', 'Aceptado');
+(2, 4, 1, 'Boleta', '123', '1234', '2018-04-17 00:00:00', '0.00', '240.00', 'Aceptado'),
+(3, 5, 1, 'Boleta', 'F001', '1', '2023-06-21 00:00:00', '0.00', '120.00', 'Aceptado'),
+(4, 5, 1, 'Boleta', 'B001', '2', '2023-07-24 00:00:00', '0.00', '10.00', 'Aceptado');
 
 --
 -- Índices para tablas volcadas
@@ -410,7 +412,7 @@ ALTER TABLE `detalle_ingreso`
 -- AUTO_INCREMENT de la tabla `detalle_venta`
 --
 ALTER TABLE `detalle_venta`
-  MODIFY `iddetalle_venta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `iddetalle_venta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `ingreso`
@@ -434,7 +436,7 @@ ALTER TABLE `persona`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `idusuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `idusuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `usuario_permiso`
@@ -446,7 +448,7 @@ ALTER TABLE `usuario_permiso`
 -- AUTO_INCREMENT de la tabla `venta`
 --
 ALTER TABLE `venta`
-  MODIFY `idventa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `idventa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Restricciones para tablas volcadas
@@ -493,33 +495,6 @@ ALTER TABLE `venta`
   ADD CONSTRAINT `fk_venta_persona` FOREIGN KEY (`idcliente`) REFERENCES `persona` (`idpersona`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_venta_usuario` FOREIGN KEY (`idusuario`) REFERENCES `usuario` (`idusuario`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 COMMIT;
-
-
---
--- TRIGGER ACTUALIZAR STOCK
---
-
-DELIMITER //
-CREATE TRIGGER tr_updStockIngreso AFTER INSERT ON detalle_ingreso FOR EACH ROW BEGIN UPDATE articulo SET stock = stock + NEW.cantidad WHERE articulo.idarticulo = NEW.idarticulo;
-END
-//
-DELIMITER ;
-
-
---
--- TRIGGER VENTAS STOCK
---
-
-DELIMITER //
-CREATE TRIGGER tr_updStockVenta AFTER INSERT ON
-detalle_venta
-FOR EACH ROW BEGIN
-UPDATE articulo SET stock = stock - NEW.cantidad
-WHERE articulo.idarticulo = NEW.idarticulo;
-END
-//
-DELIMITER ;
-
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
