@@ -1,2 +1,2 @@
-Sistema de Ventas Ajax PHP_POO MySQL Jquery
+Sistema de Ventas Ajax y php pdo
 ============
